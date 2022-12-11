@@ -1,0 +1,58 @@
+.vending-machine {
+    display: flex;
+    flex-direction: row;
+}
+
+.products {
+    display: flex;
+    width: 300px;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+}
+
+.product {
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 80px;
+    box-sizing: border-box;
+    gap: 5px;
+}
+
+.product-icon {
+    display: flex;
+    width: 100%;
+    height: 50px;
+    font-size: 50px;
+    justify-content: center;
+}
+
+.product-name {
+    display: flex;
+    font-weight: 700;
+    width: 100%;
+    justify-content: center;
+}
+
+.product-quantity {
+    display: flex;
+    justify-content: center;
+}
+
+.product-price {
+    display: flex;
+    justify-content: center;
+    font-weight: 500;
+}
+
+.product-selection-button {
+    display: flex;
+    justify-content: center;
+}
+
+.payment {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+}
