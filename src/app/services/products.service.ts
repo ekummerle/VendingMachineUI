@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -13,40 +13,60 @@ export class ProductsService {
 
   getProducts(): Observable<Product[]> {
     return this.http.get<Product[]>(`${environment.url}GetProducts`).pipe(
-      catchError((err) => {
-        console.error('Unable to get products from the server - ' + err.message);
+      catchError((err: HttpErrorResponse) => {
+        console.error('Unable to get products from the server - ' + err.error);
 
-        return throwError(() => new Error('Unable to get products from the server.'));
+        if (err.status === 400) {
+          return throwError(() => new Error(err.error));
+        }
+        else {
+          return throwError(() => new Error('Unable to get products from the server.'));
+        }
       })
     );
   }
 
   sellProduct(id: number): Observable<Product> {
     return this.http.post<Product>(`${environment.url}SellProduct/${id}`, null).pipe(
-      catchError((err) => {
-        console.error(`Unable to sell product with id = ${id}`, err.message);
+      catchError((err: HttpErrorResponse) => {
+        console.error(`Unable to sell product with id = ${id}`, err.error);
 
-        return throwError(() => new Error(`Unable to sell product with id = ${id}`));
+        if (err.status === 400) {
+          return throwError(() => new Error(err.error));
+        }
+        else {
+          return throwError(() => new Error(`Unable to sell product with id = ${id}`));
+        }
       })
     );
   }
 
   restockProduct(id: number, quantity: number): Observable<Product> {
-    return this.http.post<Product>(`${environment.url}RestockProduct/${id}`, null).pipe(
-      catchError((err) => {
-        console.error(`Unable to restock product with id = ${id}`, err.message);
+    return this.http.post<Product>(`${environment.url}RestockProduct/${id}`, JSON.stringify(quantity), {headers: {'Content-Type': 'application/json'}}).pipe(
+      catchError((err: HttpErrorResponse) => {
+        console.error(`Unable to restock product with id = ${id}`, err.error);
 
-        return throwError(() => new Error(`Unable to restock product with id = ${id}`));
+        if (err.status === 400) {
+          return throwError(() => new Error(err.error));
+        }
+        else {
+          return throwError(() => new Error(`Unable to restock product with id = ${id}`));
+        }
       })
     );
   }
 
   restockAll(): Observable<any> {
     return this.http.post(`${environment.url}RestockAll`, null).pipe(
-      catchError((err) => {
-        console.error('Unable to restock products.', err.message);
+      catchError((err: HttpErrorResponse) => {
+        console.error('Unable to restock products.', err.error);
 
-        return throwError(() => new Error('Unable to restock products.'));
+        if (err.status === 400) {
+          return throwError(() => new Error(err.error));
+        }
+        else {
+          return throwError(() => new Error('Unable to restock products.'));
+        }
       })
     );
   }

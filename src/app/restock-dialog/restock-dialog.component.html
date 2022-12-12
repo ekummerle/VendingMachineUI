@@ -1,0 +1,13 @@
+<h1 mat-dialog-title>Restocking Product {{product.Name}}</h1>
+<div mat-dialog-content>
+    <mat-form-field appearance="fill">
+        <mat-label>
+            Quantity
+        </mat-label>
+        <input matInput [(ngModel)]="quantity">
+    </mat-form-field>
+</div>
+<div mat-dialog-actions>
+    <button mat-button (click)="onCancel()">Cancel</button>
+    <button mat-button (click)="onOk()" cdkFocusInitial>Ok</button>
+</div>

@@ -9,13 +9,35 @@
       <div class="product-name">{{product.Name}}</div>
       <div class="product-quantity">{{product.CurrentStock}} / {{product.StockLimit}}</div>
       <div class="product-price">${{product.Price | number: '1.2-2'}}</div>
-      <div class="product-selection-button">
-        <button [disabled]="activeTransaction === undefined">Select</button>
+      <div class="button">
+        <button [disabled]="!activeTransaction" (click)="sellProduct(product.ID)">Select</button>
+      </div>
+      <div class="button">
+        <button [disabled]="activeTransaction" (click)="showRestockDialog(product)">Restock</button>
       </div>
     </div>
   </div>
   <div class="payment">
-    <button>Pay by Cash</button>
-    <button>Pay by Card</button>
+    <div class="payment-buttons" *ngIf="!activeTransaction">
+      <button (click)="createTransaction('Cash')">Pay by Cash</button>
+      <button (click)="createTransaction('Card')">Pay by Card</button>
+    </div>
+    <div class="active-payment" *ngIf="activeTransaction">
+      <button (click)="cancelTransaction()">Cancel</button>
+      ${{activeTransaction.Amount | number: '1.2-2'}}
+    </div>
+    <button [disabled]="activeTransaction" (click)="restockAll()">Restock All</button>
+    <div class="payment-amounts">
+      <div class="amount">
+        <span class="amount-value">${{cashAmount | number: '1.2-2'}}</span> payments in Cash
+      </div>
+      <div class="amount">
+        <span class="amount-value">${{cardAmount | number: '1.2-2'}}</span> payments by Card
+      </div>
+      <div class="amount">
+        <span class="amount-value">${{totalAmount | number: '1.2-2'}}</span> total payments
+      </div>
+    </div>
+    <button [disabled]="activeTransaction" (click)="clearFunds()">Clear Funds</button>
   </div>
 </div>
