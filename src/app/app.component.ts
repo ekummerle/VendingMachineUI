@@ -7,6 +7,8 @@ import { Transaction } from './models/transaction.model';
 import { RestockDialogComponent } from './restock-dialog/restock-dialog.component';
 import { ProductsService } from './services/products.service';
 import { TransactionsService } from './services/transactions.service';
+import * as signalR from '@microsoft/signalr';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -24,6 +26,8 @@ export class AppComponent {
   cardAmount: number = 0;
   totalAmount: number = 0;
 
+  private hubConnection!: signalR.HubConnection;
+
   constructor(private productService: ProductsService, private transactionService: TransactionsService, private snackBar: MatSnackBar, public dialog: MatDialog) {
     forkJoin([
       this.productService.getProducts(),
@@ -38,6 +42,22 @@ export class AppComponent {
       this.cashAmount = cashAmount;
       this.cardAmount = cardAmount;
       this.totalAmount = totalAmount;
+    });
+
+    this.hubConnection = new signalR.HubConnectionBuilder().withUrl(`${environment.url}messages`).build();
+
+    this.hubConnection.start().then(() => console.log('Connection started')).catch(err => console.error(`Error while starting connection: ${err}`));
+
+    this.hubConnection.on('CashAmountUpdated', (newValue: number) => {
+      this.cashAmount = newValue;
+    });
+
+    this.hubConnection.on('CardAmountUpdated', (newValue: number) => {
+      this.cardAmount = newValue;
+    });
+
+    this.hubConnection.on('TotalAmountUpdated', (newValue: number) => {
+      this.totalAmount = newValue;
     });
   }
 
@@ -111,9 +131,6 @@ export class AppComponent {
 
   clearFunds(): void {
     this.transactionService.clearFunds().subscribe({
-      next: () => {
-        this.updatePaymentAmounts();
-      },
       error: (err) => {
         this.showError(err.message);
       }
@@ -130,18 +147,5 @@ export class AppComponent {
     if (productIndex > -1) {
       this.products[productIndex] = product;
     }
-  }
-
-  private updatePaymentAmounts(): void {
-    forkJoin([
-      this.transactionService.getPaymentAmount('Cash'),
-      this.transactionService.getPaymentAmount('Card'),
-      this.transactionService.getPaymentAmount('')
-    ])
-    .subscribe(([cashAmount, cardAmount, totalAmount]) => {
-      this.cashAmount = cashAmount;
-      this.cardAmount = cardAmount;
-      this.totalAmount = totalAmount;
-    });
   }
 }
